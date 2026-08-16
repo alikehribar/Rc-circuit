@@ -62,9 +62,7 @@ Both channels are identical: 2.2 kΩ and 4.7 nF. GP2 and GP3 generate the square
 | Max usable square wave | ≈ 9.7 kHz |
 | Working frequency (chosen) | 2 kHz → half period ≈ 24τ |
 | 63.2 % level (at a 3.3 V step) | 2.09 V |
-| **τ including the 50 Ω GPIO impedance** | **10.58 µs** (+2.3 %) |
-| **Settled step with 50 Ω included** | **3.23 V** |
-| **63.2 % level of that real step** | **2.04 V** |
+
 
 ---
 
@@ -125,7 +123,7 @@ The transfer function is `H(s) = 1/(1 + sRC)`, a low-pass filter. The cutoff fre
 
 ---
 
-## Pre-lab calculations
+## Pre calculations
 
 1. Work out the τ, f_c and t_r values in the table above yourself and confirm they hold.
 2. Show that `v_C(τ)/V` comes out to 0.632.
@@ -295,20 +293,6 @@ Watch the **sign** of your deviations, not just the size. Component tolerance sc
 The difference between the two channels, on the other hand, is not measurement error but component tolerance itself. Comment on it separately.
 
 ---
-
-## Questions
-
-1. Why is τ independent of the square wave amplitude? Show it from the equations.
-2. Why can't a plain sampling loop in MicroPython measure this curve? What minimum ratio should hold between the sampling interval and τ?
-3. Why does equivalent-time sampling only work on **repetitive** signals? What would you do for a single-shot event?
-4. If the points on the `ln(v/V)` plot curve away from the line toward the end, what could cause it?
-5. If you took the output across the resistor instead of the capacitor, what would the transfer function be, and how would that circuit respond to the same square wave?
-6. A scope probe typically loads the circuit with 10 MΩ and 15 pF. Is that negligible next to 4.7 nF? Does the situation change with a 1× probe (usually around 100 pF)? Calculate it.
-7. At the moment of sampling, the ADC input connects its own hold capacitor (a few pF) to the circuit. Which way does that shift the voltage you measure?
-8. When the half period is shorter than 3τ, the capacitor doesn't fully discharge and each cycle starts from a residual voltage instead of zero. Does the 63.2 % method still give the right τ? If not, which method does?
-9. Suppose you find an 8 % difference between the two channels' time constants. How would you tell whether it comes from the resistors or the capacitors?
-10. The 50 Ω GPIO impedance raises τ by 2.3 % but does **not** change the difference between the two channels. Explain why, and say what that implies about which of your results it can and cannot account for.
-11. Both the log-slope method and the two-point method are immune to getting the amplitude `V` wrong, but the 63.2 % method is not. Show why from the equations, and say which method you would trust most on this board given the 3.23 V step.
 
 ---
 
