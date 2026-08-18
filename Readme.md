@@ -6,13 +6,12 @@ Lab sheet — soldered two-channel Pico board
 
 ## Objective
 
-Measure the exponential step response of an RC circuit and find its time constant `τ = RC` three independent ways:
+Measure the exponential step response of an RC circuit and find its time constant `τ = RC` two independent ways:
 
 1. **Simulation** — your reference curve, and the place to debug the analysis method on noise-free data
-2. **The board** — digital measurement through the Pico's ADC
-3. **Oscilloscope** — analogue confirmation
+2. **Oscilloscope** — analogue confirmation
 
-If all three agree, the job is done. If they don't, the learning is in finding out where the difference comes from.
+If both agree, the job is done. If they don't, the learning is in finding out where the difference comes from.
 
 The skill at the centre of this: instead of eyeballing an exponential and saying "τ is about there", take the logarithm, straighten it out, and get τ from the slope.
 
@@ -151,7 +150,7 @@ Also plot the **residuals** `res = y − (m·t + b)` and note their spread. On s
 
 ### Change τ and watch
 
-Repeat for τ = 5, 10.34 and 20 µs on one plot. The shape is identical; only the time axis stretches. This is the same effect you will see in Stage 3 when you raise the frequency.
+Repeat for τ = 5, 10.34 and 20 µs on one plot. The shape is identical; only the time axis stretches. This is the same effect you will see in Stage 2 when you raise the frequency.
 
 ### What to record
 
@@ -162,52 +161,7 @@ Repeat for τ = 5, 10.34 and 20 µs on one plot. The shape is identical; only th
 
 ---
 
-## Stage 2 — Measurement with the Board
-
-### First, a problem: is the ADC fast enough?
-
-τ = 10.34 µs. To sample the curve properly you need 5–10 points per time constant, so a sampling interval of 1–2 µs. A plain `adc.value` loop in CircuitPython takes 50–100 µs per sample — longer than the entire 51.7 µs transient. **You cannot measure this curve with a plain loop.** That is not a setback; it is one of the things the experiment teaches: your instrument's bandwidth has to exceed the event you are measuring.
-
-### DMA burst capture (500 kSps)
-
-The Pico's ADC runs up to 500 kSps free-running, i.e. 2 µs per sample: 5 points per τ, 26 points across 5τ. Marginal for a log fit, but sufficient. The curve will look angular — that is expected.
-
-CircuitPython's `analogbufio.BufferedIn` does exactly this: DMA fills a buffer in the background with Python out of the loop. `pwmio` generates the square wave in hardware at the same time, since the pin cannot be toggled from Python while `readinto` is blocking.
-
-Procedure:
-
-1. Start the square wave on GP2 with `pwmio` at 2 kHz, 50 % duty.
-2. Open `analogbufio.BufferedIn(board.A0, sample_rate=500000)` and `readinto` a buffer.
-3. Convert to volts (`buf[i]/65535 · 3.3`) and to time (`i · 2 µs`), print as CSV over serial.
-4. `deinit()` the ADC, then repeat for GP3 / A1.
-
-A 1000-sample buffer is 2 ms — four periods at 2 kHz, so four independent discharges you can fit separately and average.
-
-**Verify your sample rate rather than assuming it.** You know the square wave period exactly, so count how many samples fall in one period of the captured data. If 2 kHz does not come out to 250 samples, the ADC is not running at the rate you asked for, and every τ you compute from that file is wrong by the same factor. Do this check before any fitting.
-
-### One more trap: the top of the ADC's range
-
-The ADC measures against 3.3 V and the signal settles at essentially full scale, so the tail of the *charging* curve is where the ADC is least linear — and where the log fit is most sensitive, because `ln` blows up as `v` approaches `V`. Worse, any sample that reaches code 65535 is clipped and carries no information at all; count how many of your samples sit exactly at 3.300 V.
-
-**Fit the discharge, not the charge.** The discharge heads towards 0 V, away from the rail. Fit it over roughly 0 to 2τ and drop anything below 5 % of `V₀`, where noise dominates the logarithm.
-
-### Analysis
-
-The analysis is the same code as Stage 1 with three changes: read `t` and `v` from the CSV, find the falling edge from `vout` itself (there is no `v_in` column), and use the real sample interval. Note that the first few samples of a discharge all exceed the edge threshold, so the edge indices come in runs — take the first index of each run.
-
-Fit each discharge separately, then report the mean and spread across them. The spread is your repeatability; it is not the same thing as the deviation from theory.
-
-### What to record
-
-- The raw CSV
-- Charging and discharging curves
-- The `ln(v/V₀)` plot, τ from the slope, and the residual spread
-- The samples-per-period check confirming the true sampling interval
-- τ for both channels (X and Y) separately
-
----
-
-## Stage 3 — Oscilloscope
+## Stage 2 — Oscilloscope
 
 ### Connections and settings
 
@@ -251,8 +205,6 @@ Do **not** drive them a quarter period out of phase for this: that produces a la
 | Theory (nominal 2.2 kΩ × 4.7 nF) | 10.34 µs | 10.34 µs | — |
 | Theory (R measured with multimeter) | | | |
 | Simulation | | | |
-| Board — log slope | | | |
-| Board — spread across discharges | | | |
 | Scope — 63.2 % | | | |
 | Scope — rise time | | | |
 | Scope — log slope | | | |
@@ -260,7 +212,7 @@ Do **not** drive them a quarter period out of phase for this: that produces a la
 
 Deviation = `|τ_measured − τ_theory| / τ_theory × 100`
 
-**What to expect:** resistor tolerance 1–5 %, capacitor tolerance 5–10 %, so around 10 % deviation is normal. If you see more, check in this order: probe compensation, the actual ADC sampling interval, stray capacitance on the board, the ADC sampling load.
+**What to expect:** resistor tolerance 1–5 %, capacitor tolerance 5–10 %, so around 10 % deviation is normal. If you see more, check in this order: probe compensation, stray capacitance on the board.
 
 Watch the **sign** of your deviations, not just the size. Component tolerance scatters both ways; a systematic error pushes every measurement the same way.
 
@@ -272,9 +224,9 @@ The difference between the two channels is not measurement error but component t
 
 ## What the report needs
 
-Objective, the equations used, the board schematic, simulation plots, board data plots, oscilloscope captures, the completed results table, the `ln(v/V₀)` plots with residuals, and the raw data file. Axis labels and units on every plot.
+Objective, the equations used, the board schematic, simulation plots, oscilloscope captures, the completed results table, the `ln(v/V₀)` plots with residuals, and the raw data file. Axis labels and units on every plot.
 
-In the discussion, compare the three stages: which came closest to theory, which deviated most, and why.
+In the discussion, compare the two stages: which came closest to theory, which deviated most, and why.
 
 ---
 
@@ -290,5 +242,4 @@ Two-point:   τ = (t₂ − t₁)/ln(v₁/v₂)
 Rise time:   t_r = 2.20·τ = 22.7 µs
 Cutoff:      f_c = 1/(2πτ) = 15.4 kHz
 Design rule: 5τ ≤ P/2  →  f ≤ 9.7 kHz
-Sample rate: ≥ 5 points per τ  →  ≤ 2 µs per sample
 ```
