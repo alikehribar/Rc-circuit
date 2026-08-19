@@ -30,9 +30,9 @@ In other words, the capacitor voltage can only change while current is flowing; 
 
 Since the same current flows through the resistor and the capacitor in a series RC circuit, the charging and discharging equations of the circuit were derived as shown in the figures below.
 
-![Handwritten derivation of the charging equation](images/image.png)
+<img src="images/image.png" alt="Handwritten derivation of the charging equation" width="550">
 
-![Handwritten derivation of the discharging equation](images/image-1.jpeg)
+<img src="images/image-1.jpeg" alt="Handwritten derivation of the discharging equation" width="550">
 
 Physical reading: while the capacitor is empty (`Vc = 0`) the current is at its maximum. From the moment the capacitor begins to charge, the difference decays exponentially. In an RC circuit the charging mathematically never ends.
 
@@ -44,7 +44,7 @@ Unit check: `Ω·F = s`.
 
 Circuit diagram:
 
-![Circuit diagram: pulse source, series resistor and capacitor to ground](images/image-2.png)
+<img src="images/image-2.png" alt="Circuit diagram: pulse source, series resistor and capacitor to ground" width="400">
 
 Nominal values:
 
@@ -73,17 +73,17 @@ Taking the component values (`R = 10 kΩ`, `C = 4.7 nF`) as inputs, the experime
 
 The circuit was first connected to the oscilloscope. Using cursor mode, `τ` and the peak PWM voltage were measured and the trace was recorded. The trace was almost identical to the one expected from the simulation.
 
-![Oscilloscope trace at 100 µs/div: PWM square wave and the capacitor voltage](images/image-6.png)
+<img src="images/image-6.png" alt="Oscilloscope trace at 100 µs/div: PWM square wave and the capacitor voltage" width="400">
 
 The figure shows the PWM square wave together with the capacitor being charged and discharged by it at a PWM frequency of 2 kHz.
 
-![Simulated input and output at the same timebase](images/image-3.png)
+<img src="images/image-3.png" alt="Simulated input and output at the same timebase" width="400">
 
 At the 100 µs/div timebase the two traces do indeed almost coincide.
 
 Since we then wanted to feed our own data into `sim.py` and test it, the data of that measurement was pulled from the oscilloscope over LAN and processed in `sim.py`. (Since the data coming from the oscilloscope are raw ADC codes, the `3.28 V` peak measured earlier in cursor mode was taken as the reference and the scaling factor was derived from it.)
 
-![Measured oscilloscope trace overlaid on the simulated trace](compare.png)
+<img src="images/compare.png" alt="Measured oscilloscope trace overlaid on the simulated trace" width="400">
 
 This is a comparison of the voltage data taken from the oscilloscope and converted by ourselves against the simulated trace and its values. The plot is produced by `sim_measured.py`.
 
