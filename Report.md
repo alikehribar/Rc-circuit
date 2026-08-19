@@ -30,9 +30,9 @@ In other words, the capacitor voltage can only change while current is flowing; 
 
 Since the same current flows through the resistor and the capacitor in a series RC circuit, the charging and discharging equations of the circuit were derived as shown below.
 
-<img src="images/derivation_charging.png" alt="Derivation of the charging equation" width="550">
+<img src="images/derivation_charging.png" alt="Derivation of the charging equation" width="350">
 
-<img src="images/derivation_discharging.png" alt="Derivation of the discharging equation" width="550">
+<img src="images/derivation_discharging.png" alt="Derivation of the discharging equation" width="350">
 
 Physical reading: while the capacitor is empty (`Vc = 0`) the current is at its maximum. From the moment the capacitor begins to charge, the difference decays exponentially. In an RC circuit the charging mathematically never ends.
 
