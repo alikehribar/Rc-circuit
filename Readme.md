@@ -23,22 +23,12 @@ The skill at the centre of this: instead of eyeballing an exponential and saying
                      10 kΩ            X node
    GP2  (pin 4)  ---[========]-----------+------------  scope CH1
                                          |
-                                         +------------  GP26 (pin 31) ADC0
+                                         +
                                          |
                                         === 4.7 nF
                                          |
                                         GND
 
-                     10 kΩ            Y node
-   GP3  (pin 5)  ---[========]-----------+------------  scope CH2
-                                         |
-                                         +------------  GP27 (pin 32) ADC1
-                                         |
-                                        === 4.7 nF
-                                         |
-                                        GND
-
-   GND (pin 38) / AGND (pin 33) --------------------  scope ground clips
 ```
 
 Both channels are nominally identical: 10 kΩ and 4.7 nF. GP2 and GP3 generate the square wave themselves, so no function generator is needed; amplitude 3.3 V.
@@ -49,10 +39,7 @@ Both channels are nominally identical: 10 kΩ and 4.7 nF. GP2 and GP3 generate t
 |----------|-------|
 | τ = RC | 47.00 µs |
 | Cutoff frequency f_c = 1/(2πτ) | 3.39 kHz |
-| Rise time t_r = 2.20·τ | 103.4 µs |
 | 5τ (full settling) | 235 µs |
-| Max usable square wave (5τ ≤ P/2) | ≈ 2.13 kHz |
-| Working frequency | 2 kHz → half period ≈ 5.3τ |
 | 63.2 % level | 2.09 V |
 
 With 10 kΩ the working frequency of 2 kHz sits just under the 2.13 kHz settling
@@ -189,13 +176,6 @@ For each channel:
 4. Take 5–6 points off the discharge, plot `ln(v/V₀)`, get τ from the slope.
 5. Cross-check with the two-point method.
 
-### Both channels in XY mode
-
-Drive GP2 and GP3 **in phase** and switch the scope to XY mode, which plots CH1 horizontally against CH2 vertically instead of against time.
-
-If the two channels were identical, `v_X = v_Y` at every instant and the trace would collapse onto a straight 45° line. Any mismatch in τ makes one channel lag the other during the transient, so the trace opens into a thin loop. The width of that loop is your channel mismatch, read straight off the screen — no cursors, no fitting.
-
-Do **not** drive them a quarter period out of phase for this: that produces a large loop even with perfectly matched channels, and buries the mismatch you are looking for.
 
 ---
 

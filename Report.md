@@ -39,6 +39,18 @@ Unit check: `Ω·F = s`.
 
 **Definition of τ:** the time taken for the difference to the target to fall to `1/e ≈ 36.8 %` of its initial value. Equivalently, in charging, the time taken to reach `63.2 %` of the target.
 
+### 2.2 Cutoff frequency
+
+The same circuit read in the frequency domain is a low-pass filter: slow signals pass to the
+capacitor, fast ones are attenuated. The turning point is the cutoff (corner) frequency, the
+frequency at which the output amplitude falls to `1/√2 ≈ 70.7 %` of the input (−3 dB):
+
+$$f_c = \frac{1}{2\pi\tau} = \frac{1}{2\pi RC}$$
+
+With the nominal `τ = 47.00 µs` this gives `f_c = 3.39 kHz` (derived). The PWM was driven at
+`f = 2 kHz`, i.e. `f/f_c = 0.59`, just below the corner — which is why the capacitor still has
+time to approach the supply rail within each half period instead of settling to a small ripple.
+
 ## 3. Circuit and Components
 
 Circuit diagram:
@@ -89,12 +101,12 @@ This is a comparison of the voltage data taken from the oscilloscope and convert
 
 ## 5. Results
 
-| Method | τ | Difference from R·C |
-|---|---|---|
-| Theoretical (R·C) | 47.00 µs | — |
-| Simulation (log-fit) | 47.00 µs | ~0 % |
-| Oscilloscope, cursor mode CH1/X | 41.80 µs | −11.1 % |
-| Oscilloscope, data analysis CH1/X | 49.96µs | +6.30 % |
+| Method | τ | f_c = 1/(2πτ) | Difference from R·C |
+|---|---|---|---|
+| Theoretical (R·C) | 47.00 µs | 3.39 kHz | — |
+| Simulation (log-fit) | 47.00 µs | 3.39 kHz | ~0 % |
+| Oscilloscope, cursor mode CH1/X | 41.80 µs | 3.81 kHz | −11.1 % |
+| Oscilloscope, data analysis CH1/X | 49.96 µs | 3.19 kHz | +6.30 % |
 
 ## 6. Discussion / Error Analysis
 
