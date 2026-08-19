@@ -30,34 +30,9 @@ In other words, the capacitor voltage can only change while current is flowing; 
 
 Since the same current flows through the resistor and the capacitor in a series RC circuit, the charging and discharging equations of the circuit were derived as shown below.
 
-Charging:
+<img src="images/derivation_charging.png" alt="Derivation of the charging equation" width="550">
 
-$$
-\begin{aligned}
-i &= \frac{V_p - V_c}{R} = C\,\frac{dV_c}{dt}, \qquad \tau = RC \\[4pt]
-\frac{V_p - V_c}{RC} &= \frac{dV_c}{dt} \\[4pt]
-u = V_p - V_c &\;\Longrightarrow\; du = -\,dV_c \\[4pt]
-\frac{u}{\tau} &= -\frac{du}{dt} \\[4pt]
-\int \frac{du}{u} &= \int -\frac{dt}{\tau} \\[4pt]
-\ln u(t) &= -\frac{t}{\tau} + c \\[4pt]
-V_p - V_c(t) &= e^{-t/\tau}\,e^{c} \\[4pt]
-V_c(0) = 0 &\;\Longrightarrow\; e^{c} = V_p \\[6pt]
-\boxed{\,V_c(t) = V_p\left(1 - e^{-t/\tau}\right)\,}
-\end{aligned}
-$$
-
-Discharging:
-
-$$
-\begin{aligned}
-\frac{dV_c}{dt} &= -\frac{V_c}{RC}, \qquad \tau = RC \\[4pt]
-\int \frac{dV_c}{V_c} &= \int -\frac{dt}{RC} \\[4pt]
-\ln V_c(t) &= -\frac{t}{RC} + c \\[4pt]
-V_c(t) &= e^{-t/RC}\,e^{c} \\[4pt]
-V_c(0) = V_p &\;\Longrightarrow\; e^{c} = V_p \\[6pt]
-\boxed{\,V_c(t) = V_p\,e^{-t/\tau}\,}
-\end{aligned}
-$$
+<img src="images/derivation_discharging.png" alt="Derivation of the discharging equation" width="550">
 
 Physical reading: while the capacitor is empty (`Vc = 0`) the current is at its maximum. From the moment the capacitor begins to charge, the difference decays exponentially. In an RC circuit the charging mathematically never ends.
 
