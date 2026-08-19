@@ -20,8 +20,6 @@ for i in range(1, len(t)):
     vout[i] = (target + (vout[i-1] - target) * a)
 
 
-
-
 plt.plot((t * 1e6), v_in, label='Vin')
 plt.plot((t * 1e6), vout, label='Vout')
 plt.xlabel('Time (us)')

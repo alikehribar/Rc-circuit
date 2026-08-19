@@ -28,11 +28,36 @@ In other words, the capacitor voltage can only change while current is flowing; 
 
 ### 2.1 Current flowing through the circuit
 
-Since the same current flows through the resistor and the capacitor in a series RC circuit, the charging and discharging equations of the circuit were derived as shown in the figures below.
+Since the same current flows through the resistor and the capacitor in a series RC circuit, the charging and discharging equations of the circuit were derived as shown below.
 
-<img src="images/image.png" alt="Handwritten derivation of the charging equation" width="550">
+Charging:
 
-<img src="images/image-1.jpeg" alt="Handwritten derivation of the discharging equation" width="550">
+$$
+\begin{aligned}
+i &= \frac{V_p - V_c}{R} = C\,\frac{dV_c}{dt}, \qquad \tau = RC \\[4pt]
+\frac{V_p - V_c}{RC} &= \frac{dV_c}{dt} \\[4pt]
+u = V_p - V_c &\;\Longrightarrow\; du = -\,dV_c \\[4pt]
+\frac{u}{\tau} &= -\frac{du}{dt} \\[4pt]
+\int \frac{du}{u} &= \int -\frac{dt}{\tau} \\[4pt]
+\ln u(t) &= -\frac{t}{\tau} + c \\[4pt]
+V_p - V_c(t) &= e^{-t/\tau}\,e^{c} \\[4pt]
+V_c(0) = 0 &\;\Longrightarrow\; e^{c} = V_p \\[6pt]
+\boxed{\,V_c(t) = V_p\left(1 - e^{-t/\tau}\right)\,}
+\end{aligned}
+$$
+
+Discharging:
+
+$$
+\begin{aligned}
+\frac{dV_c}{dt} &= -\frac{V_c}{RC}, \qquad \tau = RC \\[4pt]
+\int \frac{dV_c}{V_c} &= \int -\frac{dt}{RC} \\[4pt]
+\ln V_c(t) &= -\frac{t}{RC} + c \\[4pt]
+V_c(t) &= e^{-t/RC}\,e^{c} \\[4pt]
+V_c(0) = V_p &\;\Longrightarrow\; e^{c} = V_p \\[6pt]
+\boxed{\,V_c(t) = V_p\,e^{-t/\tau}\,}
+\end{aligned}
+$$
 
 Physical reading: while the capacitor is empty (`Vc = 0`) the current is at its maximum. From the moment the capacitor begins to charge, the difference decays exponentially. In an RC circuit the charging mathematically never ends.
 
@@ -57,6 +82,7 @@ Measured values:
 - R_measured = 9.78 kΩ
 - C_measured = 4.9 nF
 - τ_measured = 41.80 µs (cursor mode on the oscilloscope)
+  τ_measured2 = 47.92 µs (with R and C measured)
 
 ## 4. Method
 
@@ -100,7 +126,6 @@ This is a comparison of the voltage data taken from the oscilloscope and convert
 
 As a source of error, I know that the resistor and the capacitor themselves have a tolerance of about 10 %. My cursor-mode reading on the oscilloscope, deviations included, is probably very nearly correct. The data-analysis part appears close to the true value, deviating by `|+%6,3%|`, even though it carries an error margin coming from noise and from the scaling — but this is probably only a coincidence.
 
-I did not check the probe compensation, so these errors may also have been caused by the resistance inside the probe.
 
 ## 7. Conclusion
 

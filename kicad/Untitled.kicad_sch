@@ -2199,7 +2199,7 @@
 				)
 			)
 		)
-		(property "Value" "2.2K R"
+		(property "Value" "10K R"
 			(at 74.93 101.6 90)
 			(show_name no)
 			(do_not_autoplace no)
