@@ -1,0 +1,5 @@
+# macOS Finder metadata
+.DS_Store
+
+# KiCad editor auto-backup history
+kicad/.history/

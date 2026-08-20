@@ -55,7 +55,7 @@ time to approach the supply rail within each half period instead of settling to 
 
 Circuit diagram:
 
-<img src="images/image-2.png" alt="Circuit diagram: pulse source, series resistor and capacitor to ground" width="400">
+<img src="images/circuit_schematic.png" alt="Circuit diagram: pulse source, series resistor and capacitor to ground" width="400">
 
 Nominal values:
 
@@ -72,7 +72,7 @@ Measured values:
 
 ## 4. Method
 
-### 4.1 Simulation (`sim.py`)
+### 4.1 Simulation (`code_sim.py`)
 
 Taking the component values (`R = 10 kΩ`, `C = 4.7 nF`) as inputs, the experiment was reproduced numerically:
 
@@ -85,17 +85,20 @@ Taking the component values (`R = 10 kΩ`, `C = 4.7 nF`) as inputs, the experime
 
 The circuit was first connected to the oscilloscope. Using cursor mode, `τ` and the peak PWM voltage were measured and the trace was recorded. The trace was almost identical to the one expected from the simulation.
 
-<img src="images/image-6.png" alt="Oscilloscope trace at 100 µs/div: PWM square wave and the capacitor voltage" width="400">
+<img src="images/scope_100us_per_div.png" alt="Oscilloscope trace at 100 µs/div: PWM square wave and the capacitor voltage" width="400">
 
 The figure shows the PWM square wave together with the capacitor being charged and discharged by it at a PWM frequency of 2 kHz.
 
-<img src="images/image-3.png" alt="Simulated input and output at the same timebase" width="400">
+<img src="images/sim_100us_per_div.png" alt="Simulated input and output at the same timebase" width="400">
 
 At the 100 µs/div timebase the two traces do indeed almost coincide.
 
-Since we then wanted to feed our own data into `sim.py` and test it, the data of that measurement was pulled from the oscilloscope over LAN and processed in `sim.py`. (Since the data coming from the oscilloscope are raw ADC codes, the `3.28 V` peak measured earlier in cursor mode was taken as the reference and the scaling factor was derived from it.)
 
-<img src="images/compare.png" alt="Measured oscilloscope trace overlaid on the simulated trace" width="400">
+###
+
+Since we then wanted to feed our own data into `code_sim.py` and test it, the data of that measurement was pulled from the oscilloscope over LAN and processed in `sim_measured.py`. (Since the data coming from the oscilloscope are raw ADC codes, the `3.28 V` peak measured earlier in cursor mode was taken as the reference and the scaling factor was derived from it.)
+
+<img src="images/measured_vs_sim.png" alt="Measured oscilloscope trace overlaid on the simulated trace" width="400">
 
 This is a comparison of the voltage data taken from the oscilloscope and converted by ourselves against the simulated trace and its values. The plot is produced by `sim_measured.py`.
 

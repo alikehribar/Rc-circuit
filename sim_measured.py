@@ -10,7 +10,7 @@ P = (1 / F)
 
 smooth = np.convolve(v_meas, (np.ones(9) / 9), mode="same")   
 high = (smooth > (0.5 * smooth.max()))
-rises = np.where((~high[:-1] & high[1:]))[0]      
+rises = np.where((~high[:-1] & high[1:]))[0]     
 ts = (P / np.median(np.diff(rises)))            
 t_meas = ((np.arange(len(v_meas)) - rises[0]) * ts) 
 
@@ -22,11 +22,13 @@ V = 3.3
 t_sim = np.arange(0, (3 * P), ts)                
 v_in = (V * np.where(((t_sim % P) < (0.5 * P)), 1, 0))
 v_sim = np.zeros_like(t_sim)
+
 a = np.exp(-ts / tau)
 for i in range(1, len(t_sim)):
     v_sim[i] = (v_in[i - 1] + ((v_sim[i - 1] - v_in[i - 1]) * a))
 i_half = np.argmax((v_sim > (0.5 * V)))
 t_sim = (t_sim - t_sim[i_half])
+breakpoint()
 
 
 plt.figure(figsize=(11, 5))
@@ -39,5 +41,5 @@ plt.ylabel('Voltage (V)')
 plt.legend()
 plt.grid(alpha=0.3)
 plt.tight_layout()
-plt.savefig('compare.png', dpi=140)
+plt.savefig('images/measured_vs_sim.png', dpi=140)
 plt.show()
