@@ -93,8 +93,10 @@ The figure shows the PWM square wave together with the capacitor being charged a
 
 At the 100 µs/div timebase the two traces do indeed almost coincide.
 
+## Pulling Data from an Oscilloscope
+After connecting the oscilloscope to the computer using its Ethernet port, we extracted the data from the oscilloscope using Python with the data request parameters we obtained from the Owon website. Afterwards, since the data provided by the oscilloscope consisted of raw ADC codes, we matched and scaled them against the maximum value we knew.
 
-###
+
 
 Since we then wanted to feed our own data into `code_sim.py` and test it, the data of that measurement was pulled from the oscilloscope over LAN and processed in `sim_measured.py`. (Since the data coming from the oscilloscope are raw ADC codes, the `3.28 V` peak measured earlier in cursor mode was taken as the reference and the scaling factor was derived from it.)
 

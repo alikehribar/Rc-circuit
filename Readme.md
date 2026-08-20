@@ -1,7 +1,7 @@
 # Measuring the Time Constant of an RC Circuit
 
 Lab sheet — soldered two-channel Pico board
-
+[To check Report](Report.md)
 ---
 
 ## Objective
