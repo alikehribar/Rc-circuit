@@ -179,6 +179,75 @@ For each channel:
 
 ---
 
+## Stage 3 — Pulling the waveform over LAN
+
+Cursors give you one number off the screen. To run the log-fit on real data you need the
+samples themselves, and the scope will hand them over through its Ethernet port.
+
+### Connect
+
+1. Ethernet cable from the scope to the same network as the computer.
+2. On the scope, find the LAN settings and note the IP address. Set a static address if
+   the network hands out a different one on every power cycle.
+3. From the computer, `ping` that address before writing any code. If the ping fails,
+   nothing downstream will work.
+
+### Ask for the waveform
+
+The instrument listens on a TCP port and answers text commands. Open a socket to it, send
+the "give me the CH1 waveform" command from the **Owon programming manual for your model**,
+and read the reply. Two things always bite here:
+
+- **Send the terminator the manual specifies** (usually `\n`). Without it the scope waits
+  forever and your socket times out.
+- **Read until the reply is complete.** A few thousand samples do not arrive in one packet.
+  Loop on `recv` until you have the byte count the header promises.
+
+**On this bench, for the Owon scope used here** — a worked example, in `data/fetch_owon.py`:
+port `3000`, command `STARTBIN\n`, and the reply is one binary block holding `3040` signed
+16-bit samples per channel, CH1 at byte offset `81` and CH2 at byte `6220`. Those offsets are
+model specific. If yours differ, find them the way these were found: dump the block, unpack it
+from a few candidate offsets, and plot each one — the right offset is the one that looks like
+your square wave.
+
+### Convert codes to volts
+
+What arrives is **raw ADC codes**, not volts — small integers, typically 0-255. The scope
+knows the vertical scale; the file does not. So fix it against something you measured:
+
+    volts_per_code = V_peak_measured / code_max
+
+Read `V_peak_measured` with a cursor on the settled top **before** you disconnect, and use
+the largest code in the capture as `code_max`. Every voltage you derive inherits the error
+of that one cursor reading, so take it carefully.
+
+### Check before you trust it
+
+- **Sample interval: derive it, do not believe it.** If the instrument states an interval,
+  cross-check it against something you set yourself. Here the scope's own figure of `0.4 µs`
+  put the square wave at `5.09 kHz` when the Pico was driving `2 kHz`. Counting rising edges
+  instead gave `491` samples per `500 µs` period, so `ts = 1.018 µs`. Aim for at least 20
+  samples inside one `tau`; below that the early part of the curve is too coarse to fit.
+- **Number of distinct codes:** if the trace only uses 40 of the 255 available levels, the
+  vertical range is set too wide and you are throwing away resolution. Zoom in vertically
+  and recapture.
+- **Plot the raw codes first.** If the square wave is not obviously a square wave, stop —
+  something is wrong with the request or the parsing, not with the circuit.
+
+### Save it
+
+Write one row per sample as CSV with a header — `sample,raw_code,volts`, not `time_s`, since
+a time column you had to derive anyway is a number waiting to be trusted by mistake — and
+commit it.
+The raw codes belong in the file next to the volts: if the scale factor turns out to be
+wrong, you can rescale without going back to the bench.
+
+**Commit the acquisition script too.** A capture nobody can reproduce is not a measurement.
+The one used here is `data/fetch_owon.py`; the analysis that reads its output is
+`sim_measured.py`.
+
+---
+
 ## Results
 
 | Measurement | X channel τ | Y channel τ | Deviation % |
@@ -188,7 +257,8 @@ For each channel:
 | Simulation (log slope) | 47.00 µs | — | ~0 % |
 | Scope — 63.2 % (cursor) | 41.80 µs | not measured | −11.1 % |
 | Scope — rise time | not measured | not measured | |
-| Scope — log slope (captured data) | 49.96 µs | not measured | +6.3 % |
+| Scope — log slope (captured data) | 50.81 µs | not measured | +8.1 % |
+| Scope — direct fit on raw volts | 49.85 µs | not measured | +6.1 % |
 | Scope — two-point | not measured | not measured | |
 
 Deviation = `|τ_measured − τ_theory| / τ_theory × 100`
