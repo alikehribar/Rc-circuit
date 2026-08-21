@@ -133,35 +133,6 @@ reference for the top code, which gives the scale factor
 
     3.28 V / 82 codes = 0.04 V per code
 
-and the `volts` column of the file is the `raw_code` column multiplied by it. This is the
-weak point of the capture: every voltage in the file inherits the error of that single
-cursor reading, and the code step of `0.04 V` sets a quantisation floor of about `1.2 %`
-of the peak.
-
-The `time_s` column of the file cannot be trusted. It states a sample interval of `0.4 µs`,
-which would put the square wave at `5.09 kHz` — but the Pico is set to `2 kHz` and nothing
-else in the measurement contradicts that. The interval was therefore recovered from the data:
-six rising edges were detected, spaced `491` samples apart, and one period is `500 µs`, so
-
-    ts = 500 µs / 491 samples = 1.018 µs
-
-`data/fetch_owon.py` therefore does not write a time column at all: it writes
-`sample,raw_code,volts`, leaving the sample index and letting the analysis script derive
-the interval from the edges. The committed `data/ch1.txt` predates that decision and still
-carries the original `time_s` column, which is why `sim_measured.py` reads column 2
-(`volts`) and ignores column 0.
-
-| Quantity | Value | Source |
-|---|---|---|
-| Samples | 3 040 | file |
-| Sample interval | 1.018 µs | derived from edge spacing |
-| Sample rate | 982 kSa/s | derived |
-| Record length | 3.095 ms (6.19 periods) | derived |
-| Vertical resolution | 0.04 V per code | derived from the 3.28 V cursor reading |
-
-That interval places 46 samples inside one `tau`, which is enough for the fit. The `0.04 V`
-step is the coarser of the two limits and sets the error floor of this method.
-
 ### 4.4 Fitting the measured discharge (`sim_measured.py`)
 
 The file is read by `sim_measured.py`, which rebuilds the time axis from the rising edges,
@@ -173,7 +144,7 @@ has to be recovered from the output itself. Every cycle is folded on top of the 
 averaged, which cancels most of the noise, and the discharge is taken to begin at the last
 sample of that averaged profile's flat top.
 
-That last word decides the answer. The capacitor reaches the top and then **sits there for
+The capacitor reaches the top and then **sits there for
 about 34 µs** until the input falls, so the trace carries a flat plateau before the discharge
 starts. Anchoring on the first sample of the plateau drags a horizontal stretch into the fit,
 which bends the log curve and inflates the result: `τ = 51.2 µs` with the fitted `V₀` coming
@@ -193,11 +164,6 @@ to only 4 ADC codes here, where quantisation dominates; `10 %` is 8 codes.
 <img src="images/logfit_measured.png" alt="Measured discharge on log axes with the fitted line, and the residuals below" width="500">
 
 The residuals scatter about zero with no systematic bend, which says the measured discharge really is exponential and the model is the right one. They widen towards the right and fall into visible steps: late in the discharge the voltage is only a few ADC codes, so each code is a larger fraction of the reading.
-
-The result is `τ = 50.8 ± 0.5 µs`, the uncertainty being the spread across those cuts — one
-honest measure of what the choice of fit window costs. The residual spread of `0.0428` in log
-units is about `4.3 %` in voltage, some 5 700 times the simulation's `7.5e-6`, which is the
-price of real noise and `0.04 V` quantisation.
 
 Fitting the same 743 points on the raw volts, with no logarithm taken, gives
 `τ = 49.85 µs` with `V₀ = 3.30 V`. This is a separate check rather than an output of
@@ -248,13 +214,6 @@ worry that an error there corrupts `τ`. It does not. Multiplying every voltage 
 The scale factor affects the fitted `V₀` and nothing else. This is a second reason to fit the
 logarithm rather than the raw curve.
 
-**One assumption that propagates fully.** The time axis rests entirely on the PWM being
-exactly `2 kHz`, because `ts = P / Ni` and `P` is taken as `500 µs`. A `1 %` error in the
-square wave frequency is a `1 %` error in `τ`, with nothing in the data to reveal it. The
-assumption is a safe one — the Pico generates the wave with hardware counters clocked from
-the board crystal, and the divider for `2 kHz` works out to a whole number — but it is an
-assumption, not a measurement.
-
 ### 6.2 Does the measurement agree with theory?
 
 Comparing against the nominal `47.00 µs` is the wrong test, because the parts in the circuit
@@ -295,22 +254,6 @@ The two fit-based methods run on the same 743 points and agree with each other t
 despite weighting the data in opposite ways. Where they disagree with the cursor, the cursor
 is the weaker measurement.
 
-### 6.4 What is not quantified here
-
-Three things in the results table remain empty, and none of them can be filled from the data
-already captured:
-
-- **The Y channel was never measured.** The board carries two nominally identical RC
-  channels and the Pico drives both. The difference between them would show component
-  tolerance directly, rather than inferring it from a datasheet figure. `data/fetch_owon.py`
-  already pulls CH2 out of the same binary block, so closing this gap costs one re-capture
-  with a probe on the Y node — but only a re-capture: the raw block from the original
-  session was not saved, so CH2 cannot be recovered from anything now in the repository.
-- **Rise time** (`τ = t_r / 2.20`) needs the oscilloscope's automatic measurement.
-- **The input channel was not captured**, only the capacitor node. Having it would fix the
-  start of each discharge from the falling edge instead of reconstructing it from the
-  averaged plateau, and would confirm the `2 kHz` assumption directly instead of relying on it.
-
 ## 7. Conclusion
 
 The aim of the experiment was to find the time constant `τ` of an RC circuit, and it was
@@ -321,16 +264,6 @@ That value agrees with theory. Computed from the parts actually in the circuit, 
 a multimeter, `τ = R·C = 47.9 ± 1.8 µs`; the two differ by 1.5 standard deviations, which is
 agreement rather than discrepancy. Comparing instead against the nominal `47.00 µs` gives an
 apparent `+8.1 %` error, most of which is simply the parts not matching their printed values.
-
-The simulation returned `47.000 µs` against the `47.00 µs` it was given. That is not a result
-about the circuit but a check on the analysis: the same code, validated on data with a known
-answer, was then pointed at the measurement. It also caught a real defect — the residual plot
-showed two flat bands that turned out to be a floating point error in the time axis.
-
-What the experiment did not settle: the Y channel was never measured, so the two channels
-could not be compared; rise time was not recorded; and the input channel was not captured,
-which left the start of each discharge to be reconstructed from the data rather than read
-from the driving edge.
 
 ## 8. Files in this repository
 
