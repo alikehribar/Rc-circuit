@@ -265,14 +265,3 @@ a multimeter, `τ = R·C = 47.9 ± 1.8 µs`; the two differ by 1.5 standard devi
 agreement rather than discrepancy. Comparing instead against the nominal `47.00 µs` gives an
 apparent `+8.1 %` error, most of which is simply the parts not matching their printed values.
 
-## 8. Files in this repository
-
-| File | What it does | Produces |
-|---|---|---|
-| `data/fetch_owon.py` | Opens a TCP socket to the oscilloscope, sends `STARTBIN`, unpacks the binary block and scales the ADC codes to volts | `data/ch1.txt`, `data/ch2.txt` |
-| `data/ch1.txt` | The capture used in this report: 3 040 samples of the capacitor node, as `time_s,raw_code,volts` | — |
-| `code_sim.py` | Ideal simulation plus the log-fit, run on data with a known answer to validate the method | `images/logfit_sim.png` |
-| `sim_measured.py` | Rebuilds the time axis from the edges, runs the same log-fit on the measured discharge, and overlays measurement against simulation | `images/logfit_measured.png`, `images/measured_vs_sim.png` |
-
-Both analysis scripts print their numbers to the terminal; every value quoted in Sections 4
-and 5 can be reproduced by running them.
